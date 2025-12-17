@@ -1,0 +1,51 @@
+SELECT first_name, last_name, gender FROM patients WHERE gender = 'M';  
+SELECT first_name, last_name FROM patients WHERE allergies IS NULL OR TRIM(allergies) = '';
+SELECT first_name FROM patients WHERE first_name LIKE 'C%';
+SELECT first_name, last_name FROM patients WHERE weight BETWEEN 100 AND 120;
+UPDATE patients SET allergies = 'NKA' WHERE allergies IS NULL;
+SELECT concat(first_name, ' ' ,last_name) AS full_name FROM patients; 
+SELECT p.first_name, p.last_name, pr.province_name FROM patients p LEFT JOIN province_names pr ON p.province_id = pr.province_id;
+SELECT COUNT(*) AS cnt_2010 FROM patients WHERE YEAR(birth_date) = 2010;
+SELECT first_name, last_name, height FROM patients ORDER BY height desc;
+SELECT * FROM patients WHERE patient_id IN (1,45,534,879,1000);
+SELECT COUNT( *) AS total_admissions FROM admissions;
+SELECT  *  FROM admissions WHERE Date(admission_date) = Date(discharged_date);
+SELECT COUNT(*) AS admission_for_579 FROM admissions Where patient_id = 579;
+SELECT DISTINCT city FROM patients WHERE province_id = 'NS';
+SELECT first_name, last_name, birth_date FROM patients WHERE height > 160 AND weight > 70;  
+SELECT DISTINCT YEAR(birth_date) AS birth_year FROM patients ORDER BY birth_year ASC;
+SELECT first_name FROM patients GROUP BY first_name HAVING COUNT(*) = 1;
+SELECT patient_id, first_name FROM patients WHERE LOWER(first_name) LIKE 's%' AND LOWER(first_name) LIKE  '%s' AND CHAR_LENGTH(first_name) >= 6;
+SELECT DISTINCT p.patient_id, p.first_name, p.last_name FROM patients p JOIN admissions a ON p.patient_id = a.patient_id WHERE a.diagnosis = 'Dementia';
+SELECT first_name FROM patients ORDER BY CHAR_LENGTH(first_name), first_name; 
+SELECT
+          SUM(CASE WHEN gender = 'M' THEN 1 ELSE 0 END) AS male_count,
+          SUM(CASE WHEN gender = 'F' THEN 1 ELSE 0 END) AS female_count
+          FROM patients;
+SELECT patient_id, diagnosis, COUNT(*) AS times_admitted FROM admissions GROUP BY patient_id, diagnosis  HAVING COUNT(*) > 1;
+SELECT city, COUNT(*) AS patient_count FROM patients GROUP BY city
+            ORDER BY patient_count DESC, city ASC;
+
+SELECT first_name, last_name, 'Patient' AS role FROM patients UNION ALL
+           SELECT first_name, last_name, 'Doctor' AS role FROM doctors;
+SELECT allergies, COUNT(*) AS cnt FROM patients WHERE allergies IS NOT NULL AND TRIM(allergies) <> ''  GROUP BY allergies ORDER BY cnt DESC;
+SELECT first_name, last_name, birth_date FROM patients WHERE YEAR(birth_date) BETWEEN 1970 AND 1979 ORDER BY birth_date ASC;
+SELECT CONCAT(UPPER(last_name), ',', LOWER(first_name)) AS name_formatted FROM patients ORDER BY LOWER(first_name) DESC;
+SELECT province_id, SUM(height) AS total_height FROM patients
+GROUP BY province_id HAVING SUM(height) >= 7000;
+SELECT MAX(weight) - MIN(weight) AS weight_diff FROM patients
+WHERE last_name = 'Maroni',
+SELECT DAY(admission_date) AS day_of_month, COUNT(*) AS admissions_count FROM admissions GROUP BY day_of_month ORDER BY admissions_count DESC;
+SELECT (FLOOR(weight / 10) * 10) AS weight_group, COUNT(*) AS group_count FROM patients GROUP BY weight_group ORDER BY weight_group DESC;
+SELECT patient_id, weight, height,
+     CASE
+         WHEN height IS NULL OR height = 0 THEN NULL
+          WHEN weight / POW(height / 100.0, 2) >= 30 THEN 1
+     ELSE 0
+     END AS is Obese FROM patients;
+SELECT DISTINCT p.patient_id, p.first_name AS patient_first_name,
+    p.last_name AS patient_last_name, d.specialty FROM patients p
+JOIN admissions a ON p.patient_id = a.patient_id
+JOIN doctors d ON a.attending_doctor_id = d.doctor_id
+WHERE a.diagnosis = 'Epilepsy'
+  AND d.first_name = 'Lisa';
